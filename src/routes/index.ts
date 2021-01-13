@@ -1,12 +1,12 @@
 // MAIN ROUTER
-const { validate } = require('./middleware.js');
+import { validate } from './middleware';
+import { Router } from 'express';
 
 // DEPENDENCIES
-const router = require('express').Router();
+const router = Router();
 
 // MIDDLEWARE
 router.use('/authorize', require('./auth'));
 router.use('/profile', validate, require('./profile'));
 
-
-module.exports = router;
+export default router;
