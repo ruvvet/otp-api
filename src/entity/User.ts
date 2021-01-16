@@ -24,7 +24,7 @@ export class User {
   expiry: Date;
 
   @Column({ nullable: true })
-  displayName: Date;
+  displayName: string;
 
   @Column({ nullable: true })
   rank: string;

@@ -14,7 +14,8 @@ export async function validate(
   next: NextFunction
 ) {
   //check headers for their jwt token
-  const userJwt = req.headers['X-OTP-User'] as string;
+  const userJwt = req.headers['x-otp-user'] as string;
+  console.log(req.headers)
 
   // find them in the user table based on the discordid
 
@@ -28,6 +29,7 @@ export async function validate(
       where: { discordId: decodedJwt.user.discordId },
     });
     if (findUser) {
+        console.log('i found the user', findUser.discordUsername)
       //compare current time and expiration
       const now = new Date().getTime();
       const expiryDate = findUser.expiry.getTime();
