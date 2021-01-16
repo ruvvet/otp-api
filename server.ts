@@ -7,7 +7,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import routes from './src/routes';
 import { createConnection } from 'typeorm';
-
+import { Server, Socket } from 'socket.io';
+import http from 'http';
 
 dotenv.config();
 
@@ -37,9 +38,34 @@ createConnection()
       res.status(500);
     });
 
-    app.use('/', routes);
+    const clients: { [k: string]: string } = {};
+    const server = http.createServer(app);
+    const io = new Server(server, { cors: { origin: '*' } });
+
+    io.on('connection', (socket: Socket) => {
+      // client connects/emits event
+      // we get their jwt
+
+      console.log('socket online', new Date());
+      socket.on('hello', (senderId) => {
+        clients[senderId] = socket.id;
+      });
+
+      socket.on('incomingMsg', (senderId, receiverId, msg) => {
+        console.log(`${senderId} says ${msg} to ${receiverId}`);
+        if (clients[receiverId]) {
+          io.to(clients[receiverId]).emit('outgoingMsg', senderId, msg);
+        }
+      });
+
+      // socket.on('change', (e)=>{
+
+      // }
+    });
 
     // LISTEN
-    app.listen(process.env.PORT || 5000);
+    server.listen(process.env.PORT || 5000, () => {
+      console.log('SERVERBOTS ROLL OUT');
+    });
   })
   .catch((err) => console.log(err));

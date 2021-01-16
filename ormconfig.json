@@ -4,7 +4,7 @@
   "port": 5432,
   "username": "postgres",
   "password": "jenny",
-  "database": "otp_DB",
+  "database": "otp_db",
   "synchronize": true,
   "logging": false,
   "entities": ["src/entity/**/*.ts"],

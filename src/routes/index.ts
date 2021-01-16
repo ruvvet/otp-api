@@ -6,7 +6,10 @@ import { Router } from 'express';
 const router = Router();
 
 // MIDDLEWARE
+router.use('/swipe', validate, require('./swipe'));
 router.use('/authorize', require('./auth'));
 router.use('/profile', validate, require('./profile'));
+router.use('/chat', validate, require('./chat'));
+
 
 export default router;

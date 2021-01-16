@@ -1,13 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 import { Picture } from './Picture';
 import { Swipe } from './Swipe';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  uuid: string;
 
-  @Column()
+  @PrimaryColumn()
   discordId: string;
 
   @Column()
@@ -25,43 +23,43 @@ export class User {
   @Column()
   expiry: Date;
 
-  @Column()
+  @Column({ nullable: true })
   displayName: Date;
 
-  @Column()
+  @Column({ nullable: true })
   rank: string;
 
   @OneToMany(() => Picture, (picture) => picture.user)
   pictures: Picture[];
 
-  @Column()
+  @Column({ nullable: true })
   twitch: string;
 
-  @Column()
+  @Column({ nullable: true })
   twitter: string;
 
-  @Column()
+  @Column({ nullable: true })
   instagram: string;
 
-  @Column()
+  @Column({ nullable: true })
   snapchat: string;
 
-  @Column()
+  @Column({ nullable: true })
   tiktok: string;
 
-  @Column()
+  @Column({ nullable: true })
   spotify: string;
 
-  @Column()
+  @Column({ nullable: true })
   facebook: string;
 
-  @Column()
+  @Column({ nullable: true })
   reddit: string;
 
-  @Column()
+  @Column({ nullable: true })
   att: string;
 
-  @Column()
+  @Column({ nullable: true })
   def: string;
 
   @OneToMany(() => Swipe, (swipe) => swipe.liker)
