@@ -15,7 +15,7 @@ export async function validate(
 ) {
   //check headers for their jwt token
   const userJwt = req.headers['x-otp-user'] as string;
-  console.log(req.headers)
+
 
   // find them in the user table based on the discordid
 
