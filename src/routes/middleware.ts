@@ -25,14 +25,14 @@ export async function validate(
 
     // lookup the user in the repo
     const userRepo = getRepository(User);
-    const findUser = await userRepo.findOne({
-      where: { discordId: decodedJwt.user.discordId },
+    const foundUser = await userRepo.findOne({
+      where: { discordId: decodedJwt.user},
     });
-    if (findUser) {
-        console.log('i found the user', findUser.discordUsername)
+    if (foundUser) {
+        console.log('i found the user', foundUser.discordUsername)
       //compare current time and expiration
       const now = new Date().getTime();
-      const expiryDate = findUser.expiry.getTime();
+      const expiryDate = foundUser.expiry.getTime();
 
       // if expiry date is less than 1 day
       const day = 1000 * convertDaytoSec(1);
@@ -40,7 +40,7 @@ export async function validate(
       // refresh their token
       if (expiryDate - now < day) {
         // call the refresh function, pass in found user obj
-        const updatedUser = await refresh(findUser);
+        const updatedUser = await refresh(foundUser);
         // save the modified returned user obj
         await userRepo.save(updatedUser);
       }

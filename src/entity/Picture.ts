@@ -10,8 +10,9 @@ export class Picture {
     @ManyToOne(()=>User)
     user: User;
 
-
     @Column()
     url: string;
 
+    @Column()
+    index: number;
 }
