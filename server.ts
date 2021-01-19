@@ -1,14 +1,14 @@
 // MAIN SERVER FILE
 
 // DEPENDENCIES
-import dotenv from 'dotenv';
-import cors from 'cors';
-import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import routes from './src/routes';
-import { createConnection } from 'typeorm';
-import { Server, Socket } from 'socket.io';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
+import { Server, Socket } from 'socket.io';
+import { createConnection } from 'typeorm';
+import routes from './src/routes';
 
 dotenv.config();
 
@@ -20,6 +20,9 @@ createConnection()
     // MIDDLEWARE
     app.use(cors({ origin: '*' }));
     app.use(express.urlencoded({ extended: false }));
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: false }));
+
     app.use('/', routes);
 
     // 400 errors handler

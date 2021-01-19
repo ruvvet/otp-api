@@ -1,33 +1,34 @@
+import { v2 as cloudinary } from 'cloudinary';
 import { Request, Response, Router } from 'express';
-import { getRepository } from 'typeorm';
-import { User } from '../entity/User';
 import jwt from 'jsonwebtoken';
-import bodyParser from 'body-parser';
-import { unauthorized, handleAxiosError } from '../utils';
+import multer from 'multer';
+import { getRepository } from 'typeorm';
 import { config } from '../constants';
-import { JWT } from '../interfaces';
 import { Picture } from '../entity/Picture';
+import { User } from '../entity/User';
+import { JWT } from '../interfaces';
+import { unauthorized } from '../utils';
+
 
 const router = Router();
 
 // MIDDLEWARE
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: false }));
+
+const uploads = multer({ dest: './uploads/' });
 
 router.get('/', getUser);
 router.post('/', updateProfile);
-router.put('/pics', uploadPics);
-
+router.put('/pics', uploads.single('pic'), uploadPics);
 
 async function getUser(req: Request, res: Response) {
   const userJwt = req.headers['x-otp-user'] as string;
   const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
 
-    console.log('getting details')
-  // lookup the user in the repo
+   // lookup the user in the repo
   const userRepo = getRepository(User);
   const foundUser = await userRepo.findOne({
     where: { discordId: decodedJwt.user },
+    relations: ['pictures'],
   });
 
   res.json(foundUser);
@@ -43,10 +44,8 @@ async function updateProfile(req: Request, res: Response) {
     where: { discordId: decodedJwt.user },
   });
 
-  console.log(foundUser);
 
   if (foundUser) {
-    console.log(foundUser);
     foundUser.displayName = req.body.displayName;
     foundUser.rank = req.body.rank;
     foundUser.twitch = req.body.socials.twitch;
@@ -67,21 +66,48 @@ async function updateProfile(req: Request, res: Response) {
   return unauthorized(req, res);
 }
 
+async function uploadPics(req: Request, res: Response) {
+  const userJwt = req.headers['x-otp-user'] as string;
+  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
 
+  const file = req.file.path;
 
-async function uploadPics(req: Request, res: Response){
-    const userJwt = req.headers['x-otp-user'] as string;
-    const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
+  // uploads to cloudinary
+  cloudinary.uploader.upload(file, async (error, result) => {
+    if (!result) {
+      return res.status(500).send();
+    }
+    // 1. check if user exists
+    const userRepo = getRepository(User);
+    const foundUser = await userRepo.findOne({
+      where: { discordId: decodedJwt.user },
+    });
 
+    if (!foundUser) {
+      return unauthorized(req, res);
+    }
 
-    const pictureRepo = getRepository(Picture);
-    
+    // else the user was, found, look up to see if a pic with same index exists
+    const picRepo = getRepository(Picture);
+    const foundPic = await picRepo.findOne({
+      where: { user: foundUser, index: req.body.picKey },
+    });
 
+    if (foundPic) {
+      // replace it
+      foundPic.url = result.url;
+      await picRepo.save(foundPic);
+    } else {
+      // add it
+      const newPic = new Picture();
+      newPic.user = foundUser;
+      newPic.url = result.url;
+      newPic.index = req.body.picKey;
+      await picRepo.save(newPic);
+    }
+  });
 
-
-
-
+  res.status(201).send();
 }
-
 
 module.exports = router;

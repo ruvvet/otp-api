@@ -14,5 +14,5 @@ export class Picture {
     url: string;
 
     @Column()
-    index: number;
+    index: string;
 }

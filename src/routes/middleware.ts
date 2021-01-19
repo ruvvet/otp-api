@@ -2,7 +2,7 @@ import { config } from '../constants';
 import { unauthorized, handleAxiosError, convertDaytoSec } from '../utils';
 import { getRepository } from 'typeorm';
 import { User } from '../entity/User';
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import { NextFunction, Request, Response, Router } from 'express';
 import axios from 'axios';
 import qs from 'qs';
@@ -15,7 +15,6 @@ export async function validate(
 ) {
   //check headers for their jwt token
   const userJwt = req.headers['x-otp-user'] as string;
-
 
   // find them in the user table based on the discordid
 
@@ -45,6 +44,10 @@ export async function validate(
         await userRepo.save(updatedUser);
       }
     }
+
+    // req.userId = decodedJwt.user
+    // TODO: type with generics
+
     next();
   } else {
     unauthorized(req, res);
