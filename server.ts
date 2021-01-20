@@ -80,7 +80,14 @@ createConnection()
         }
       });
 
+      socket.on('disconnect', () => {
+        const socketKey = Object.keys(clients).find((key) => clients[key]===socket.id);
 
+          if (socketKey){
+            delete clients[socketKey]
+          }
+
+      });
     });
 
     // LISTEN
@@ -103,4 +110,3 @@ async function saveMsg(senderId: string, receiverId: string, msg: string) {
   newChat.msg = msg;
   await chatRepo.save(newChat);
 }
-
