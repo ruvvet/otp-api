@@ -7,11 +7,12 @@ import dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 import { Server, Socket } from 'socket.io';
-import { createConnection } from 'typeorm';
+import { createConnection, getRepository } from 'typeorm';
 import { JWT } from './src/interfaces';
 import routes from './src/routes';
 import jwt from 'jsonwebtoken';
 import { config } from './src/constants';
+import { Chat } from './src/entity/Chat';
 
 dotenv.config();
 
@@ -48,7 +49,6 @@ createConnection()
     const server = http.createServer(app);
     const io = new Server(server, { cors: { origin: '*' } });
 
-
     // socket is on
     io.on('connection', (socket: Socket) => {
       // client connects/emits event
@@ -60,23 +60,27 @@ createConnection()
 
         // const id = decodedJwt.user;
 
-        console.log('SENDERID', senderId)
+        console.log('SENDERID', senderId);
         // the clients array now has a k:V pair with the senderID and the socket id
         clients[senderId] = socket.id;
-
       });
 
-
       socket.on('outgoingMsg', (senderId, receiverId, msg) => {
+        // save 'incoming' msg to the database
+        // here the sender ID = sender
+        //receiver ID = client/receiver
+
+        saveMsg(senderId, receiverId, msg);
+
         console.log(`${senderId} says ${msg} to ${receiverId}`);
         if (clients[receiverId]) {
+          // save
+          // saveMsg(senderId, receiverId, msg);
           io.to(clients[receiverId]).emit('incomingMsg', senderId, msg);
         }
       });
 
-      // socket.on('change', (e)=>{
 
-      // }
     });
 
     // LISTEN
@@ -85,3 +89,18 @@ createConnection()
     });
   })
   .catch((err) => console.log(err));
+
+async function saveMsg(senderId: string, receiverId: string, msg: string) {
+  const nowUTC = new Date().toUTCString();
+  const now = new Date(nowUTC);
+
+  const chatRepo = getRepository(Chat);
+
+  const newChat = new Chat();
+  newChat.receiver = receiverId;
+  newChat.sender = senderId;
+  newChat.date = now;
+  newChat.msg = msg;
+  await chatRepo.save(newChat);
+}
+

@@ -25,6 +25,11 @@ async function getProfiles(req: Request, res: Response) {
     relations: ['pictures'],
   });
 
+
+  //TODO:  ONLY SEND BACK PROFILES OF PEOPLE YOU HAVE NOT MATCHED WITH
+
+
+
   res.json({ profiles: profiles });
 }
 
@@ -70,17 +75,12 @@ async function newSwipe(req: Request, res: Response) {
 
 async function getMatches(req: Request, res: Response) {
 
-  console.log('swipes')
   const userJwt = req.headers['x-otp-user'] as string;
   const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
 
-  console.log(req.body.swipeId);
-
   const swipeRepo = getRepository(Swipe);
-
-  const matches = await swipeRepo
+  const matches =  await swipeRepo
     .createQueryBuilder('swipe')
-
     .where('swipe.likee = :user', {user:decodedJwt.user})
     .andWhere((qb) => {
       const subQuery = qb
@@ -92,11 +92,13 @@ async function getMatches(req: Request, res: Response) {
         .getQuery();
       return `EXISTS ${subQuery}`;
     }).leftJoinAndSelect('swipe.liker', 'liker')
-    .getQuery();
+    .getMany();
 
     console.log(matches)
 
-    res.status(200).send()
+    res.json(matches)
+//TODO: get back pictures as a relationship as well
+
 
 }
 
