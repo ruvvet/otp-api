@@ -8,7 +8,10 @@ import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 import { Server, Socket } from 'socket.io';
 import { createConnection } from 'typeorm';
+import { JWT } from './src/interfaces';
 import routes from './src/routes';
+import jwt from 'jsonwebtoken';
+import { config } from './src/constants';
 
 dotenv.config();
 
@@ -45,19 +48,29 @@ createConnection()
     const server = http.createServer(app);
     const io = new Server(server, { cors: { origin: '*' } });
 
+
+    // socket is on
     io.on('connection', (socket: Socket) => {
       // client connects/emits event
       // we get their jwt
 
-      console.log('socket online', new Date());
-      socket.on('hello', (senderId) => {
+      // gettind data back for event "send my ID"
+      socket.on('sendMyId', (senderId) => {
+        // const decodedJwt = jwt.verify(senderId, config.JWT_SECRET) as JWT;
+
+        // const id = decodedJwt.user;
+
+        console.log('SENDERID', senderId)
+        // the clients array now has a k:V pair with the senderID and the socket id
         clients[senderId] = socket.id;
+
       });
 
-      socket.on('incomingMsg', (senderId, receiverId, msg) => {
+
+      socket.on('outgoingMsg', (senderId, receiverId, msg) => {
         console.log(`${senderId} says ${msg} to ${receiverId}`);
         if (clients[receiverId]) {
-          io.to(clients[receiverId]).emit('outgoingMsg', senderId, msg);
+          io.to(clients[receiverId]).emit('incomingMsg', senderId, msg);
         }
       });
 

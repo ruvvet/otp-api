@@ -1,6 +1,7 @@
 import { createConnection, getRepository } from 'typeorm';
 import { User } from './src/entity/User';
 import { Picture } from './src/entity/Picture';
+import { Swipe } from './src/entity/Swipe';
 
 // async function seedData() {
 //   const userRepo = getRepository(User);
@@ -49,50 +50,69 @@ import { Picture } from './src/entity/Picture';
 //   await picRepo.save([newPokiPic1, newPokiPic2, newPokiPic3]);
 // }
 
+// async function seedData() {
+//     const userRepo = getRepository(User);
 
-async function seedData() {
-    const userRepo = getRepository(User);
+//     const shroud = new User();
+//     shroud.discordId = '123Shroud';
+//     shroud.discordUsername = 'shroud';
+//     shroud.discordAvatar = 'www.discord.com/something.png';
+//     shroud.accessToken = '123S';
+//     shroud.refreshToken = '123S';
+//     shroud.expiry = new Date();
+//     shroud.displayName = 'Poki';
+//     shroud.rank = 'Champion';
+//     shroud.twitch = 'shroud';
+//     shroud.twitter = 'shroud';
+//     shroud.instagram = 'shroud';
+//     shroud.reddit = 'shroud';
+//     shroud.att = 'Iana';
+//     shroud.def = 'Doc';
+//     await userRepo.save(shroud);
 
-    const shroud = new User();
-    shroud.discordId = '123Shroud';
-    shroud.discordUsername = 'shroud';
-    shroud.discordAvatar = 'www.discord.com/something.png';
-    shroud.accessToken = '123S';
-    shroud.refreshToken = '123S';
-    shroud.expiry = new Date();
-    shroud.displayName = 'Poki';
-    shroud.rank = 'Champion';
-    shroud.twitch = 'shroud';
-    shroud.twitter = 'shroud';
-    shroud.instagram = 'shroud';
-    shroud.reddit = 'shroud';
-    shroud.att = 'Iana';
-    shroud.def = 'Doc';
-    await userRepo.save(shroud);
+//     const picRepo = getRepository(Picture);
 
-    const picRepo = getRepository(Picture);
+//     const newShroudPic1 = new Picture();
+//     newShroudPic1.user = shroud;
+//     newShroudPic1.url =
+//     'https://boundingintocomics.com/wp-content/uploads/2019/10/2019.10.25-05.14-boundingintocomics-5db32d840ef42.png';
+//     newShroudPic1.index = 'picOne';
 
-    const newShroudPic1 = new Picture();
-    newShroudPic1.user = shroud;
-    newShroudPic1.url =
-    'https://boundingintocomics.com/wp-content/uploads/2019/10/2019.10.25-05.14-boundingintocomics-5db32d840ef42.png';
-    newShroudPic1.index = 'picOne';
+//     const newShroudPic2 = new Picture();
+//     newShroudPic2.user = shroud;
+//     newShroudPic2.url =
+//       'https://www.videogameschronicle.com/files/2019/10/shroud.jpg';
+//     newShroudPic2.index = 'picTwo';
 
-    const newShroudPic2 = new Picture();
-    newShroudPic2.user = shroud;
-    newShroudPic2.url =
-      'https://www.videogameschronicle.com/files/2019/10/shroud.jpg';
-    newShroudPic2.index = 'picTwo';
+//     const newShroudPic3 = new Picture();
+//     newShroudPic3.user = shroud;
+//     newShroudPic3.url =
+//       'https://cdn1.dotesports.com/wp-content/uploads/2019/02/03090608/be4dfdefcc8e26b44dfa282f585f20a3.jpg';
+//     newShroudPic3.index = 'picThree';
 
-    const newShroudPic3 = new Picture();
-    newShroudPic3.user = shroud;
-    newShroudPic3.url =
-      'https://cdn1.dotesports.com/wp-content/uploads/2019/02/03090608/be4dfdefcc8e26b44dfa282f585f20a3.jpg';
-    newShroudPic3.index = 'picThree';
+//     await picRepo.save([newShroudPic1, newShroudPic2, newShroudPic3]);
+//   }
 
-    await picRepo.save([newShroudPic1, newShroudPic2, newShroudPic3]);
-  }
+async function seedSwipes() {
+  const userRepo = getRepository(User);
+  const swipeRepo = getRepository(Swipe);
+
+  const me = await userRepo.findOne({
+    where: { discordId: '101217049287622656' },
+  });
+
+  const other = await userRepo.findOne({
+    where: { discordId: '123Poki' },
+  });
+
+  const newSwipe = new Swipe();
+  newSwipe.liker = other as User;
+  newSwipe.likee = me as User;
+  newSwipe.time = new Date();
+  await swipeRepo.save(newSwipe);
+}
 
 createConnection().then(() => {
-  seedData();
+  // seedData();
+  seedSwipes();
 });

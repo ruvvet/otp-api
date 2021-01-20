@@ -68,8 +68,14 @@ async function newSwipe(req: Request, res: Response) {
   ///TODO??????? as user??????
 }
 
-function getMatches(req: Request, res: Response) {
-  //   const userJWT = jwt.verify(user, config.JWT_SECRET);
+async function getMatches(req: Request, res: Response) {
+
+
+  
+
+
+
+
 }
 
 module.exports = router;
