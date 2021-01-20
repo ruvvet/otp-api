@@ -70,11 +70,33 @@ async function newSwipe(req: Request, res: Response) {
 
 async function getMatches(req: Request, res: Response) {
 
+  console.log('swipes')
+  const userJwt = req.headers['x-otp-user'] as string;
+  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
 
-  
+  console.log(req.body.swipeId);
 
+  const swipeRepo = getRepository(Swipe);
 
+  const matches = await swipeRepo
+    .createQueryBuilder('swipe')
 
+    .where('swipe.likee = :user', {user:decodedJwt.user})
+    .andWhere((qb) => {
+      const subQuery = qb
+        .subQuery()
+        .select()
+        .from(Swipe, 'swipeInner')
+        .where('swipeInner.likee = swipe.liker')
+        .andWhere('swipeInner.liker = swipe.likee')
+        .getQuery();
+      return `EXISTS ${subQuery}`;
+    }).leftJoinAndSelect('swipe.liker', 'liker')
+    .getQuery();
+
+    console.log(matches)
+
+    res.status(200).send()
 
 }
 
