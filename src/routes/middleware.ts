@@ -1,12 +1,12 @@
-import { config } from '../constants';
-import { unauthorized, handleAxiosError, convertDaytoSec } from '../utils';
-import { getRepository } from 'typeorm';
-import { User } from '../entity/User';
-import jwt, { decode } from 'jsonwebtoken';
-import { NextFunction, Request, Response, Router } from 'express';
 import axios from 'axios';
+import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import qs from 'qs';
-import {JWT} from '../interfaces'
+import { getRepository } from 'typeorm';
+import { config } from '../constants';
+import { User } from '../entity/User';
+import { JWT } from '../interfaces';
+import { convertDaytoSec, handleAxiosError, unauthorized } from '../utils';
 
 export async function validate(
   req: Request,
@@ -25,10 +25,10 @@ export async function validate(
     // lookup the user in the repo
     const userRepo = getRepository(User);
     const foundUser = await userRepo.findOne({
-      where: { discordId: decodedJwt.user},
+      where: { discordId: decodedJwt.user },
     });
     if (foundUser) {
-        console.log('i found the user', foundUser.discordUsername)
+      console.log('i found the user', foundUser.discordUsername);
       //compare current time and expiration
       const now = new Date().getTime();
       const expiryDate = foundUser.expiry.getTime();
@@ -45,8 +45,7 @@ export async function validate(
       }
     }
 
-    // req.userId = decodedJwt.user
-    // TODO: type with generics
+    req.userId = decodedJwt.user;
 
     next();
   } else {
@@ -89,3 +88,11 @@ async function refresh(user: User) {
   // return the user object
   return user;
 }
+
+
+
+//TODO:
+// save - #last activity date on middleware as new field anytime any route is accessed
+// use that to compare new/old chat + match notifications
+// save those to redux to set as badges
+//

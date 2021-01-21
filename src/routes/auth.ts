@@ -1,12 +1,11 @@
-import { Request, Response, Router } from 'express';
-import axios from 'axios';
-import { config, oauth } from '../constants';
-import { getRepository } from 'typeorm';
-import { User } from '../entity/User';
-import { unauthorized, handleAxiosError, convertDaytoSec} from '../utils';
-import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import bodyParser from 'body-parser';
+import { Request, Response, Router } from 'express';
+import jwt from 'jsonwebtoken';
+import { getRepository } from 'typeorm';
+import { config, oauth } from '../constants';
+import { User } from '../entity/User';
 import { JWT } from '../interfaces';
+import { convertDaytoSec, unauthorized } from '../utils';
 
 const router = Router();
 

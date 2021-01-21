@@ -81,12 +81,21 @@ createConnection()
       });
 
       socket.on('disconnect', () => {
-        const socketKey = Object.keys(clients).find((key) => clients[key]===socket.id);
+        // get all keys
+        // find  the first element/key where the key is in the dict and  === the socket id
+        // then delete the k:v pair
+        const socketKey = Object.keys(clients).find(
+          (key) => clients[key] === socket.id
+        );
 
-          if (socketKey){
-            delete clients[socketKey]
-          }
-
+        if (socketKey) {
+          console.log(
+            `Client ${socketKey} disconnecting socket # ${socket.id}`
+          );
+          delete clients[socketKey];
+        } else {
+          console.log(`cant disconnect the client for socket ${socket.id}`);
+        }
       });
     });
 

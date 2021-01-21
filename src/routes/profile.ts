@@ -1,14 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { Request, Response, Router } from 'express';
-import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import { getRepository } from 'typeorm';
-import { config } from '../constants';
 import { Picture } from '../entity/Picture';
 import { User } from '../entity/User';
-import { JWT } from '../interfaces';
 import { unauthorized } from '../utils';
-
 
 const router = Router();
 
@@ -21,13 +17,10 @@ router.post('/', updateProfile);
 router.put('/pics', uploads.single('pic'), uploadPics);
 
 async function getUser(req: Request, res: Response) {
-  const userJwt = req.headers['x-otp-user'] as string;
-  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
-
-   // lookup the user in the repo
+  // lookup the user in the repo
   const userRepo = getRepository(User);
   const foundUser = await userRepo.findOne({
-    where: { discordId: decodedJwt.user },
+    where: { discordId: req.userId },
     relations: ['pictures'],
   });
 
@@ -35,15 +28,11 @@ async function getUser(req: Request, res: Response) {
 }
 
 async function updateProfile(req: Request, res: Response) {
-  const userJwt = req.headers['x-otp-user'] as string;
-  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
-
   // lookup the user in the repo
   const userRepo = getRepository(User);
   const foundUser = await userRepo.findOne({
-    where: { discordId: decodedJwt.user },
+    where: { discordId: req.userId },
   });
-
 
   if (foundUser) {
     foundUser.displayName = req.body.displayName;
@@ -67,9 +56,6 @@ async function updateProfile(req: Request, res: Response) {
 }
 
 async function uploadPics(req: Request, res: Response) {
-  const userJwt = req.headers['x-otp-user'] as string;
-  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
-
   const file = req.file.path;
 
   // uploads to cloudinary
@@ -80,7 +66,7 @@ async function uploadPics(req: Request, res: Response) {
     // 1. check if user exists
     const userRepo = getRepository(User);
     const foundUser = await userRepo.findOne({
-      where: { discordId: decodedJwt.user },
+      where: { discordId: req.userId },
     });
 
     if (!foundUser) {

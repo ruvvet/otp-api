@@ -1,11 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { getRepository, Not } from 'typeorm';
-import { User } from '../entity/User';
 import { Swipe } from '../entity/Swipe';
-import jwt from 'jsonwebtoken';
-import bodyParser from 'body-parser';
-import { JWT } from '../interfaces';
-import { config } from '../constants';
+import { User } from '../entity/User';
 import { unauthorized } from '../utils';
 
 const router = Router();
@@ -16,33 +12,25 @@ router.post('/', newSwipe);
 
 // redirect to oauth link
 async function getProfiles(req: Request, res: Response) {
-  const userJwt = req.headers['x-otp-user'] as string;
-  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
-
   const userRepo = getRepository(User);
   const profiles = await userRepo.find({
-    where: { discordId: Not(decodedJwt.user) },
+    where: { discordId: Not(req.userId) },
     relations: ['pictures'],
   });
 
-
   //TODO:  ONLY SEND BACK PROFILES OF PEOPLE YOU HAVE NOT MATCHED WITH
-
-
+  // only send back the non-sensitive information
 
   res.json({ profiles: profiles });
 }
 
 async function newSwipe(req: Request, res: Response) {
-  const userJwt = req.headers['x-otp-user'] as string;
-  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
-
   console.log(req.body.swipeId);
 
   // look up the user to see if they exist
   const userRepo = getRepository(User);
   const likerUser = await userRepo.findOne({
-    where: { discordId: decodedJwt.user },
+    where: { discordId: req.userId },
   });
 
   if (!likerUser) {
@@ -74,14 +62,10 @@ async function newSwipe(req: Request, res: Response) {
 }
 
 async function getMatches(req: Request, res: Response) {
-
-  const userJwt = req.headers['x-otp-user'] as string;
-  const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
-
   const swipeRepo = getRepository(Swipe);
-  const matches =  await swipeRepo
+  const matches = await swipeRepo
     .createQueryBuilder('swipe')
-    .where('swipe.likee = :user', {user:decodedJwt.user})
+    .where('swipe.likee = :user', { user: req.userId })
     .andWhere((qb) => {
       const subQuery = qb
         .subQuery()
@@ -91,15 +75,14 @@ async function getMatches(req: Request, res: Response) {
         .andWhere('swipeInner.liker = swipe.likee')
         .getQuery();
       return `EXISTS ${subQuery}`;
-    }).leftJoinAndSelect('swipe.liker', 'liker')
+    })
+    .leftJoinAndSelect('swipe.liker', 'liker')
     .getMany();
 
-    console.log(matches)
+  console.log(matches);
 
-    res.json(matches)
-//TODO: get back pictures as a relationship as well
-
-
+  res.json(matches);
+  //TODO: get back pictures as a relationship as well
 }
 
 module.exports = router;

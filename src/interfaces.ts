@@ -1,7 +1,12 @@
+import {Request} from 'express'
+
 export interface JWT {
-  user: {
-    discordId: string;
-  };
+  user: string;
   iat: number;
   exp: number;
+}
+
+
+export interface ValidatedRequest extends Request {
+  userId: string,
 }
