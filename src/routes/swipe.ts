@@ -25,7 +25,6 @@ async function getProfiles(req: Request, res: Response) {
 }
 
 async function newSwipe(req: Request, res: Response) {
-  console.log(req.body.swipeId);
 
   // look up the user to see if they exist
   const userRepo = getRepository(User);
@@ -78,8 +77,6 @@ async function getMatches(req: Request, res: Response) {
     })
     .leftJoinAndSelect('swipe.liker', 'liker')
     .getMany();
-
-  console.log(matches);
 
   res.json(matches);
   //TODO: get back pictures as a relationship as well

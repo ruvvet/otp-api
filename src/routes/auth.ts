@@ -52,14 +52,13 @@ async function exchange(req: Request, res: Response) {
   }
 
   //calculate expiration date
-  //TODO: update to utc?
   const now = new Date().getTime();
   const expiryDateUTC = new Date(
     now + 1000 * userAuth.expires_in
   ).toUTCString();
   const expiryDate = new Date(expiryDateUTC);
-
-  console.log(expiryDate, expiryDate.getTime(), expiryDateUTC);
+  const lastActiveUTC = new Date().toUTCString();
+  const lastActive = new Date(lastActiveUTC);
 
   // lookup the user in the repo
   const userRepo = getRepository(User);
@@ -69,15 +68,18 @@ async function exchange(req: Request, res: Response) {
 
   // if found, they're already in the database
   if (findUser) {
-    console.log('found me');
     // update them, send them a new jwt token
     findUser.accessToken = userAuth.access_token;
     findUser.refreshToken = userAuth.refresh_token;
     findUser.expiry = expiryDate;
+    findUser.lastActive = lastActive;
     await userRepo.save(findUser);
 
     const token = jwt.sign(
-      { exp: new Date().getTime() / 1000 + convertDaytoSec(30) , user: findUser.discordId},
+      {
+        exp: new Date().getTime() / 1000 + convertDaytoSec(30),
+        user: findUser.discordId,
+      },
       config.JWT_SECRET
     );
 
@@ -86,7 +88,7 @@ async function exchange(req: Request, res: Response) {
   }
 
   // else create a new user
-  console.log('make new person');
+
   const newUser = new User();
   newUser.discordId = userInfo.id;
   newUser.discordUsername = userInfo.username;
@@ -94,33 +96,39 @@ async function exchange(req: Request, res: Response) {
   newUser.accessToken = userAuth.access_token;
   newUser.refreshToken = userAuth.refresh_token;
   newUser.expiry = expiryDate;
+  newUser.lastActive = lastActive;
   await userRepo.save(newUser);
 
   const token = jwt.sign(
-    { exp: new Date().getTime() / 1000 + convertDaytoSec(30) , user: newUser.discordId},
+    {
+      exp: new Date().getTime() / 1000 + convertDaytoSec(30),
+      user: newUser.discordId,
+    },
     config.JWT_SECRET
   );
-;
 
-  console.log('jwt token', token);
   // return status code 201 for created + jwt
   return res.status(201).json(token);
 }
 
 function refreshJWT(req: Request, res: Response) {
-  const userJwt = req.headers['X-OTP-User'] as string;
+  const userJwt = req.headers['x-otp-user'] as string;
 
   if (!userJwt) {
+    console.log('unauthorized, kick you out')
     return unauthorized(req, res);
   }
-
   try {
+
     const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
 
-    if (decodedJwt.exp * 1000 - new Date().getTime() < 24 * 60 * 60 * 1000) {
+    if (
+      decodedJwt.exp * 1000 - new Date().getTime() <
+      convertDaytoSec(7) * 1000
+    ) {
       const token = jwt.sign(
         {
-          exp: new Date().getTime() / 1000 + 30 * 24 * 60 * 60,
+          exp: new Date().getTime() / 1000 + convertDaytoSec(30),
           user: decodedJwt.user,
         },
         config.JWT_SECRET

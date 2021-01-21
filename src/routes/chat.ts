@@ -4,12 +4,13 @@ import { Chat } from '../entity/Chat';
 
 const router = Router();
 
-router.get('/:buddyId', getChatHistory);
 router.get('/convos', getChatConvos);
+router.get('/:buddyId', getChatHistory);
 
 async function getChatHistory(req: Request, res: Response) {
-  const chatBuddy = '3'; //req.userId
-  const chatBuddyOne = '1'; //req.params.buddyId
+
+  const chatBuddy = '1'; //req.userId
+  const chatBuddyOne = '2'; //req.params.buddyId
 
   const chatRepo = getRepository(Chat);
 
@@ -24,6 +25,8 @@ async function getChatHistory(req: Request, res: Response) {
 }
 
 async function getChatConvos(req: Request, res: Response) {
+
+  console.log('convos')
   const tempMe = '1';
 
   const chatRepo = getRepository(Chat);
@@ -32,17 +35,31 @@ async function getChatConvos(req: Request, res: Response) {
   //   where: [{sender: tempMe }, {receiver: tempMe}]
   // })
 
+
+  // const convos = await chatRepo
+  //   .createQueryBuilder('chat')
+  //   .where('chat.receiver = :id', { id: tempMe })
+  //   .orWhere('chat.sender = :id', { id: tempMe })
+  //   .groupBy('chat.id')
+  //   .addGroupBy("chat.receiver")
+  //   .orderBy('chat.date', 'DESC')
+  //   .getMany();
+
+
+
   const convos = await chatRepo
     .createQueryBuilder('chat')
-    .select('sender')
+    .select(['chat.receiver','chat.sender'])
     .where('chat.receiver = :id', { id: tempMe })
-    .distinctOn(['chat.sender'])
-    .getMany();
+    .orWhere('chat.sender = :id', { id: tempMe })
+    .groupBy('chat.receiver')
+    .addGroupBy('chat.sender')
+    .getRawMany();
 
-  //TODO: COME BACK AND FIX THIS WHY IS THIS NOT WORKING
 
-  console.log(convos);
-  res.status(200).send();
+
+  //TODO: join or lookup to get additional data
+  res.json(convos);
 }
 
 module.exports = router;

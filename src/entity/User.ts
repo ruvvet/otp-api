@@ -14,10 +14,10 @@ export class User {
   @Column()
   discordAvatar: string;
 
-  @Column()
+  @Column({select: false})
   accessToken: string;
 
-  @Column()
+  @Column({select: false})
   refreshToken: string;
 
   @Column()
@@ -62,7 +62,12 @@ export class User {
   @Column({ nullable: true })
   def: string;
 
+  @Column({ nullable: true })
+  lastActive: Date;
+
   @OneToMany(() => Swipe, (swipe) => swipe.liker)
   swipes: Swipe[];
 
 }
+
+//TODO: lastActive should not be null

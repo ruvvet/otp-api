@@ -28,22 +28,29 @@ export async function validate(
       where: { discordId: decodedJwt.user },
     });
     if (foundUser) {
-      console.log('i found the user', foundUser.discordUsername);
+      const lastActiveUTC = new Date().toUTCString();
+      const lastActiveDate = new Date(lastActiveUTC);
       //compare current time and expiration
       const now = new Date().getTime();
       const expiryDate = foundUser.expiry.getTime();
 
       // if expiry date is less than 1 day
-      const day = 1000 * convertDaytoSec(1);
+      const day = 1000 * convertDaytoSec(10);
 
       // refresh their token
       if (expiryDate - now < day) {
         // call the refresh function, pass in found user obj
         const updatedUser = await refresh(foundUser);
         // save the modified returned user obj
+        updatedUser.lastActive = lastActiveDate;
         await userRepo.save(updatedUser);
+      } else {
+        foundUser.lastActive = lastActiveDate;
+        await userRepo.save(foundUser);
       }
     }
+
+    //TODO: make this prettier
 
     req.userId = decodedJwt.user;
 
@@ -89,10 +96,8 @@ async function refresh(user: User) {
   return user;
 }
 
-
-
 //TODO:
-// save - #last activity date on middleware as new field anytime any route is accessed
+
 // use that to compare new/old chat + match notifications
 // save those to redux to set as badges
 //
