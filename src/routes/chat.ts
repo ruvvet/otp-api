@@ -4,19 +4,16 @@ import { Chat } from '../entity/Chat';
 
 const router = Router();
 
-router.get('/convos', getChatConvos);
+router.get('/', getChatConvos);
 router.get('/:buddyId', getChatHistory);
 
 async function getChatHistory(req: Request, res: Response) {
-  const chatBuddy = '1'; //req.userId
-  const chatBuddyOne = '2'; //req.params.buddyId
-
   const chatRepo = getRepository(Chat);
 
   const foundChat = await chatRepo.find({
     where: {
-      sender: In([chatBuddyOne, chatBuddy]),
-      receiver: In([chatBuddyOne, chatBuddy]),
+      sender: In([req.params.buddyId, req.userId]),
+      receiver: In([req.params.buddyId, req.userId]),
     },
   });
 
@@ -59,7 +56,7 @@ async function getChatConvos(req: Request, res: Response) {
     .addGroupBy('receiver.discordId')
     .getRawMany();
 
-  console.log(convos);
+  
 
   //TODO: join or lookup to get additional data
   res.json(convos);

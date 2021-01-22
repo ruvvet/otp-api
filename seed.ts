@@ -118,23 +118,41 @@ async function seedSwipes() {
 async function seedJennyChat() {
   const chatRepo = getRepository(Chat);
 
+  // const newChat = new Chat();
+  // newChat.receiverId = '123Poki';
+  // newChat.senderId = '101217049287622656';
+  // newChat.date = new Date();
+  // newChat.msg = 'hey there';
+
+  // const newChat1 = new Chat();
+  // newChat1.receiverId = '123Poki';
+  // newChat1.senderId = '101217049287622656';
+  // newChat1.date = new Date();
+  // newChat1.msg = 'im subscribed to you';
+
+  // const newChat2 = new Chat();
+  // newChat2.receiverId = '123Poki';
+  // newChat2.senderId = '101217049287622656';
+  // newChat2.date = new Date();
+  // newChat2.msg = 'pay attention to me';
+
   const newChat = new Chat();
-  newChat.receiverId = '123Poki';
+  newChat.receiverId = '123Shroud';
   newChat.senderId = '101217049287622656';
   newChat.date = new Date();
-  newChat.msg = 'hey there';
+  newChat.msg = 'hey shroud';
 
   const newChat1 = new Chat();
-  newChat1.receiverId = '123Poki';
+  newChat1.receiverId = '123Shroud';
   newChat1.senderId = '101217049287622656';
   newChat1.date = new Date();
-  newChat1.msg = 'im subscribed to you';
+  newChat1.msg = 'teach me how to be good';
 
   const newChat2 = new Chat();
-  newChat2.receiverId = '123Poki';
+  newChat2.receiverId = '123Shroud';
   newChat2.senderId = '101217049287622656';
   newChat2.date = new Date();
-  newChat2.msg = 'pay attention to me';
+  newChat2.msg = 'like you';
 
   await chatRepo.save([newChat, newChat1, newChat2]);
 }
@@ -148,6 +166,5 @@ createConnection().then(async () => {
   // console.log("seeding swipes")
   // await seedSwipes();
 
-
-  seedJennyChat();
+  seedSwipes()
 });
