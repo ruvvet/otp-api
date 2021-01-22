@@ -62,7 +62,7 @@ export class User {
   @Column({ nullable: true })
   def: string;
 
-  @Column({ nullable: true })
+  @Column()
   lastActive: Date;
 
   @OneToMany(() => Swipe, (swipe) => swipe.liker)

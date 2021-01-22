@@ -97,6 +97,13 @@ createConnection()
           console.log(`cant disconnect the client for socket ${socket.id}`);
         }
       });
+
+      // socket.on('checkOnline', (id, buddyId) => {
+      //   if (Object.keys(clients).includes(buddyId)) {
+      //     console.log('clients', clients);
+      //     // io.to(clients[id]).emit('confirmOnline', buddyId, true)
+      //   }
+      // });
     });
 
     // LISTEN
@@ -113,8 +120,8 @@ async function saveMsg(senderId: string, receiverId: string, msg: string) {
   const chatRepo = getRepository(Chat);
 
   const newChat = new Chat();
-  newChat.receiver = receiverId;
-  newChat.sender = senderId;
+  newChat.receiverId = receiverId;
+  newChat.senderId = senderId;
   newChat.date = now;
   newChat.msg = msg;
   await chatRepo.save(newChat);

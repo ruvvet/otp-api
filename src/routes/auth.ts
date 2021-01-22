@@ -115,7 +115,7 @@ function refreshJWT(req: Request, res: Response) {
   const userJwt = req.headers['x-otp-user'] as string;
 
   if (!userJwt) {
-    console.log('unauthorized, kick you out')
+
     return unauthorized(req, res);
   }
   try {
@@ -136,7 +136,7 @@ function refreshJWT(req: Request, res: Response) {
 
       return res.json(token);
     }
-    return res.status(200).send();
+    return res.json(userJwt)
   } catch (error) {
     // if (error instanceof TokenExpiredError) {
     //   // token expired, but we signed it
