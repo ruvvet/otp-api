@@ -79,7 +79,6 @@ async function getMatches(req: Request, res: Response) {
     .getMany();
 
 
-    console.log('matches', matches)
   res.json(matches);
   //TODO: get back pictures as a relationship as well
   //TODO: this is broke now?

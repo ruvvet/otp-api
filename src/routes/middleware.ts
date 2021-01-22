@@ -17,9 +17,6 @@ export async function validate(
   const userJwt = req.headers['x-otp-user'] as string;
 
   // find them in the user table based on the discordid
-
-  console.log('USER JWT WHY AM I BREAKING', userJwt)
-
   if (userJwt) {
 
 
@@ -49,7 +46,6 @@ export async function validate(
       //   const updatedUser = await refresh(foundUser);
       //   // save the modified returned user obj
       //   updatedUser.lastActive = lastActiveDate;
-      //   console.log('I AM ABOUT TO SAVE WITH A REFRESHED TOKEN', updatedUser.refreshToken)
       //   await userRepo.save(updatedUser);
       // } else {
         foundUser.lastActive = lastActiveDate;
@@ -77,19 +73,12 @@ export async function validate(
 
 //   const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
 
-
-//   console.log('THIS IS MY REFRESH TOKEN', user.refreshToken)
-
 //   const { data: newToken } = await axios({
 //     method: 'POST',
 //     url: 'https://discord.com/api/oauth2/token',
 //     data: qs.stringify(data),
 //     headers,
 //   }).catch(handleAxiosError);
-
-//   console.log('NEW TOKEN', newToken);
-//   console.log(newToken.expires_in);
-//   //TODO: fix  - refresh - its getting a null value bacl????????????
 
 //   // calculate the expiration
 //   const now = new Date().getTime();

@@ -56,7 +56,7 @@ async function getChatConvos(req: Request, res: Response) {
     .addGroupBy('receiver.discordId')
     .getRawMany();
 
-  
+
 
   //TODO: join or lookup to get additional data
   res.json(convos);

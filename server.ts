@@ -46,6 +46,7 @@ createConnection()
     });
 
     const clients: { [k: string]: string } = {};
+    const onlineClients :any = {}
     const server = http.createServer(app);
     const io = new Server(server, { cors: { origin: '*' } });
 
@@ -63,6 +64,7 @@ createConnection()
         console.log('SENDERID', senderId);
         // the clients array now has a k:V pair with the senderID and the socket id
         clients[senderId] = socket.id;
+        onlineClients[senderId] = socket;
       });
 
       socket.on('outgoingMsg', (senderId, receiverId, msg) => {
@@ -98,12 +100,15 @@ createConnection()
         }
       });
 
-      // socket.on('checkOnline', (id, buddyId) => {
-      //   if (Object.keys(clients).includes(buddyId)) {
-      //     console.log('clients', clients);
-      //     // io.to(clients[id]).emit('confirmOnline', buddyId, true)
-      //   }
-      // });
+      socket.on('checkOnline', (id, buddyId) => {
+        console.log('accessing checkonline event now')
+        console.log('clients', clients);
+
+        if (Object.keys(clients).includes(buddyId)) {
+          console.log('I FOUND THEM THEYRE ONLINE YAY');
+          io.to(clients[id]).emit('confirmOnline', buddyId, true)
+        }
+      });
     });
 
     // LISTEN
