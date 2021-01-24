@@ -12,8 +12,8 @@ async function getChatHistory(req: Request, res: Response) {
 
   const foundChat = await chatRepo.find({
     where: {
-      sender: In([req.params.buddyId, req.userId]),
-      receiver: In([req.params.buddyId, req.userId]),
+      senderId: In([req.params.buddyId, req.userId]),
+      receiverId: In([req.params.buddyId, req.userId]),
     },
   });
 
