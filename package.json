@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cd dist && node server.js",
+    "start": "node ./dist/server.js",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "build": "tsc -p ."
   },

@@ -7,16 +7,14 @@ import dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 import { Server, Socket } from 'socket.io';
-import { createConnection, getRepository } from 'typeorm';
-import { JWT } from './src/interfaces';
-import routes from './src/routes';
-import jwt from 'jsonwebtoken';
-import { config } from './src/constants';
+import { ConnectionOptions, createConnection, getRepository } from 'typeorm';
+import connectionOptions from './ormconfig';
 import { Chat } from './src/entity/Chat';
+import routes from './src/routes';
 
 dotenv.config();
 
-createConnection()
+createConnection(connectionOptions as ConnectionOptions)
   .then(() => {
     // APP
     const app = express();
@@ -46,7 +44,7 @@ createConnection()
     });
 
     const clients: { [k: string]: string } = {};
-    const onlineClients :any = {}
+    const onlineClients: any = {};
     const server = http.createServer(app);
     const io = new Server(server, { cors: { origin: '*' } });
 
@@ -101,12 +99,12 @@ createConnection()
       });
 
       socket.on('checkOnline', (id, buddyId) => {
-        console.log('accessing checkonline event now')
+        console.log('accessing checkonline event now');
         console.log('clients', clients);
 
         if (Object.keys(clients).includes(buddyId)) {
           console.log('I FOUND THEM THEYRE ONLINE YAY');
-          io.to(clients[id]).emit('confirmOnline', buddyId, true)
+          io.to(clients[id]).emit('confirmOnline', buddyId, true);
         }
       });
     });
