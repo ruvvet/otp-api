@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import path from 'path';
+
 dotenv.config();
 
 export default {
@@ -9,7 +10,8 @@ export default {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
-  extra: { ssl: true },
+  ssl: true,
+  extra: { ssl: { rejectUnauthorized: false } },
   synchronize: true,
   logging: false,
   entities: [
