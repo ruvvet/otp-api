@@ -44,7 +44,7 @@ createConnection(connectionOptions as ConnectionOptions)
     });
 
     const clients: { [k: string]: string } = {};
-    const onlineClients: any = {};
+    // const onlineClients: any = {};
     const server = http.createServer(app);
     const io = new Server(server, { cors: { origin: '*' } });
 
@@ -62,7 +62,10 @@ createConnection(connectionOptions as ConnectionOptions)
         console.log('SENDERID', senderId);
         // the clients array now has a k:V pair with the senderID and the socket id
         clients[senderId] = socket.id;
-        onlineClients[senderId] = socket;
+
+        socket.broadcast.emit('nowOnline', senderId);
+
+        // onlineClients[senderId] = socket;
       });
 
       socket.on('outgoingMsg', (senderId, receiverId, msg) => {
@@ -89,6 +92,7 @@ createConnection(connectionOptions as ConnectionOptions)
         );
 
         if (socketKey) {
+          socket.broadcast.emit('nowOffline', socketKey);
           console.log(
             `Client ${socketKey} disconnecting socket # ${socket.id}`
           );
@@ -98,15 +102,34 @@ createConnection(connectionOptions as ConnectionOptions)
         }
       });
 
-      socket.on('checkOnline', (id, buddyId) => {
-        console.log('accessing checkonline event now');
-        console.log('clients', clients);
+     
 
-        if (Object.keys(clients).includes(buddyId)) {
-          console.log('I FOUND THEM THEYRE ONLINE YAY');
-          io.to(clients[id]).emit('confirmOnline', buddyId, true);
+      socket.on(
+        'getOnline',
+        (
+          id,
+          chats: {
+            discordId: string;
+            discordUsername: string;
+            displayName: string;
+            discordAvatar: string;
+          }[]
+        ) => {
+          console.log('getting list of everyone online and reducing');
+
+          // const onlineChats = chats.filter((chat) => clients[chat.discordId]).map((chat)=>chat.discordId);
+
+          const onlineChats = chats.reduce<string[]>((result, chat) => {
+            if (clients[chat.discordId]) {
+              result.push(chat.discordId);
+            }
+
+            return result;
+          }, []);
+
+          io.to(clients[id]).emit('onlineChats', onlineChats);
         }
-      });
+      );
     });
 
     // LISTEN
