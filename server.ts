@@ -102,12 +102,9 @@ createConnection(connectionOptions as ConnectionOptions)
         }
       });
 
-     
-
       socket.on(
         'getOnline',
         (
-          id,
           chats: {
             discordId: string;
             discordUsername: string;
@@ -127,7 +124,7 @@ createConnection(connectionOptions as ConnectionOptions)
             return result;
           }, []);
 
-          io.to(clients[id]).emit('onlineChats', onlineChats);
+          socket.emit('onlineChats', onlineChats);
         }
       );
     });
