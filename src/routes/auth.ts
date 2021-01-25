@@ -26,7 +26,6 @@ function redirect(req: Request, res: Response) {
 
 // exchange code for tokens
 async function exchange(req: Request, res: Response) {
-  console.log(req.body.code);
 
   const userAuth = await oauth
     .tokenRequest({

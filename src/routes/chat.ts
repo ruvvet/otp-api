@@ -21,8 +21,6 @@ async function getChatHistory(req: Request, res: Response) {
 }
 
 async function getChatConvos(req: Request, res: Response) {
-  console.log('convos');
-
   const chatRepo = getRepository(Chat);
   // const convos = await chatRepo.find({
   //   select: ["sender", "receiver"],

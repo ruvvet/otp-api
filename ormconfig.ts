@@ -1,17 +1,20 @@
 import dotenv from 'dotenv';
 import path from 'path';
+import { ConnectionOptions } from 'typeorm';
 
 dotenv.config();
 
-export default {
+let config: ConnectionOptions = {
   type: 'postgres',
   host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT,
+  port: parseInt(process.env.POSTGRES_PORT!),
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
-  ssl: true,
-  extra: { ssl: { rejectUnauthorized: false } },
+  ssl: process.env.IGNORE_SSL ? undefined : true,
+  extra: process.env.IGNORE_SSL
+    ? undefined
+    : { ssl: { rejectUnauthorized: false } },
   synchronize: true,
   logging: false,
   entities: [
@@ -32,3 +35,5 @@ export default {
     subscribersDir: path.join(__dirname, 'src/subscriber'),
   },
 };
+
+export default config;

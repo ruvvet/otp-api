@@ -11,10 +11,11 @@ export class Swipe {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {eager:true})
   liker: User;
 
-  @ManyToOne(() => User)
+
+  @ManyToOne(() => User, {eager:true})
   likee: User;
 
   @Column()

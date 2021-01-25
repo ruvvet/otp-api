@@ -20,25 +20,6 @@ async function getUser(req: Request, res: Response) {
   // lookup the user in the repo
   const userRepo = getRepository(User);
   const foundUser = await userRepo.findOne({
-    // select: [
-    //   'discordUsername',
-    //   'discordAvatar',
-    //   'displayName',
-    //   'rank',
-    //   'twitch',
-    //   'twitter',
-    //   'instagram',
-    //   'snapchat',
-    //   'tiktok',
-    //   'spotify',
-    //   'facebook',
-    //   'reddit',
-    //   'att',
-    //   'def',
-    //   'lastActive',
-    // ],
-
-    // TODO: only send back info that is needed
     where: { discordId: req.userId },
     relations: ['pictures'],
   });

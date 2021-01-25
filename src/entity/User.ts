@@ -69,5 +69,3 @@ export class User {
   swipes: Swipe[];
 
 }
-
-//TODO: lastActive should not be null

@@ -18,14 +18,31 @@ async function getProfiles(req: Request, res: Response) {
     relations: ['pictures'],
   });
 
-  //TODO:  ONLY SEND BACK PROFILES OF PEOPLE YOU HAVE NOT MATCHED WITH
-  // only send back the non-sensitive information
+  const userProfile = await userRepo.findOne({
+    where: { discordId: req.userId },
+    relations: ['swipes'],
+  });
 
-  res.json({ profiles: profiles });
+  if (!userProfile) {
+    return unauthorized(req, res);
+  }
+
+  const alreadySwiped = userProfile.swipes.reduce<{[k:string]: boolean}>((result, swipe) => {
+    result[swipe.likee.discordId] = true;
+    return result;
+  }, {});
+
+  const filteredProfiles = profiles.filter(
+    (profile) => !alreadySwiped[profile.discordId]
+  );
+
+  //TODO:  ONLY SEND BACK PROFILES OF PEOPLE YOU HAVE NOT MATCHED WITH USING QUERY
+
+
+  res.json({ profiles: filteredProfiles });
 }
 
 async function newSwipe(req: Request, res: Response) {
-
   // look up the user to see if they exist
   const userRepo = getRepository(User);
   const likerUser = await userRepo.findOne({
@@ -57,7 +74,6 @@ async function newSwipe(req: Request, res: Response) {
   newSwipe.time = now;
   await swipeRepo.save(newSwipe);
 
-  ///TODO??????? as user??????
 }
 
 async function getMatches(req: Request, res: Response) {
@@ -78,10 +94,7 @@ async function getMatches(req: Request, res: Response) {
     .leftJoinAndSelect('swipe.liker', 'liker')
     .getMany();
 
-
   res.json(matches);
-  //TODO: get back pictures as a relationship as well
-  //TODO: this is broke now?
 }
 
 module.exports = router;
