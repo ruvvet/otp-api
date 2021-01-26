@@ -157,6 +157,62 @@ async function seedJennyChat() {
   await chatRepo.save([newChat, newChat1, newChat2]);
 }
 
+
+
+
+async function seedNinja() {
+  const userRepo = getRepository(User);
+
+  const ninja123 = new User();
+  ninja123.discordId = '123Ninja';
+  ninja123.discordUsername = 'ninja123';
+  ninja123.discordAvatar = 'ninja123';
+  ninja123.accessToken = '123Ninja';
+  ninja123.refreshToken = '123Ninja';
+  ninja123.expiry = new Date();
+  ninja123.displayName = 'Ninja';
+  ninja123.rank = 'Silver I';
+  ninja123.twitch = 'ninja123';
+  ninja123.twitter = 'ninja123';
+  ninja123.instagram = 'ninja123';
+  ninja123.snapchat = 'ninja123';
+  ninja123.tiktok = 'ninja123';
+  ninja123.spotify = 'ninja123';
+  ninja123.facebook = 'ninja123';
+  ninja123.reddit = 'ninja123';
+  ninja123.att = 'Dokkaebi';
+  ninja123.def = 'Caveira';
+  ninja123.lastActive = new Date();
+  await userRepo.save(ninja123);
+
+  const picRepo = getRepository(Picture);
+
+  const newNinjaPic1 = new Picture();
+  newNinjaPic1.user = ninja123;
+  newNinjaPic1.url =
+    'https://specials-images.forbesimg.com/imageserve/5f5f55887d9eec237a586841/960x0.jpg';
+  newNinjaPic1.index = 'picOne';
+
+  const newNinjaPic2 = new Picture();
+  newNinjaPic2.user = ninja123;
+  newNinjaPic2.url =
+    'https://www.tubefilter.com/wp-content/uploads/2020/11/pokimane-twitch-donations-cap-streamlabs.jpg';
+  newNinjaPic2.index = 'picTwo';
+
+  const newNinjaPic3 = new Picture();
+  newNinjaPic3.user = ninja123;
+  newNinjaPic3.url =
+    'https://cdn1.dotesports.com/wp-content/uploads/2020/09/14075123/pokimane-vtuber-1024x575.jpg';
+  newNinjaPic3.index = 'picThree';
+
+  await picRepo.save([newNinjaPic1, newNinjaPic2, newNinjaPic3]);
+
+  console.log('done')
+}
+
+
+
+
 createConnection().then(async () => {
   // seedData();
   // console.log("seeding pokimane")
@@ -166,5 +222,8 @@ createConnection().then(async () => {
   // console.log("seeding swipes")
   // await seedSwipes();
 
-  seedSwipes()
+   seedSwipes()
+
+  // seedNinja();
+
 });
