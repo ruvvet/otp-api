@@ -1,12 +1,10 @@
-import axios from 'axios';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import qs from 'qs';
 import { getRepository } from 'typeorm';
 import { config } from '../constants';
 import { User } from '../entity/User';
-import { JWT, DiscordRefresh } from '../interfaces';
-import { convertDaytoSec, handleAxiosError, unauthorized } from '../utils';
+import { JWT } from '../interfaces';
+import { unauthorized } from '../utils';
 
 export async function validate(
   req: Request,
@@ -18,11 +16,8 @@ export async function validate(
 
   // find them in the user table based on the discordid
   if (userJwt) {
-
-
     //decode the jwt
     const decodedJwt = jwt.verify(userJwt, config.JWT_SECRET) as JWT;
-
 
     // lookup the user in the repo
     const userRepo = getRepository(User);
@@ -48,8 +43,8 @@ export async function validate(
       //   updatedUser.lastActive = lastActiveDate;
       //   await userRepo.save(updatedUser);
       // } else {
-        foundUser.lastActive = lastActiveDate;
-        await userRepo.save(foundUser);
+      foundUser.lastActive = lastActiveDate;
+      await userRepo.save(foundUser);
       // }
     }
 
@@ -97,9 +92,3 @@ export async function validate(
 //   // return the user object
 //   return user;
 // }
-
-//TODO:
-
-// use that to compare new/old chat + match notifications
-// save those to redux to set as badges
-//

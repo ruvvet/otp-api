@@ -1,4 +1,4 @@
-import {Request} from 'express'
+import { Request } from 'express';
 
 export interface JWT {
   user: string;
@@ -6,16 +6,14 @@ export interface JWT {
   exp: number;
 }
 
-
 export interface ValidatedRequest extends Request {
-  userId: string,
+  userId: string;
 }
 
 export interface DiscordRefresh {
-
-  access_token:string;
-  expires_in:number;
-  refresh_token:string;
-  scope:string;
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
   token_type: string;
 }

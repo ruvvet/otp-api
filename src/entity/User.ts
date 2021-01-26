@@ -1,7 +1,6 @@
-import { Column, Entity, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Picture } from './Picture';
 import { Swipe } from './Swipe';
-import {Chat} from './Chat'
 
 @Entity()
 export class User {
@@ -14,10 +13,10 @@ export class User {
   @Column()
   discordAvatar: string;
 
-  @Column({select: false})
+  @Column({ select: false })
   accessToken: string;
 
-  @Column({select: false})
+  @Column({ select: false })
   refreshToken: string;
 
   @Column()
@@ -67,5 +66,4 @@ export class User {
 
   @OneToMany(() => Swipe, (swipe) => swipe.liker)
   swipes: Swipe[];
-
 }

@@ -88,10 +88,6 @@ async function getChatConvos(req: Request, res: Response) {
     return result;
   }, {});
 
-  // [{chat_senderId: 1, receiverId: 2}, {chat_senderId: 2, receiverId: 1}]
-
-  // TODO :  FILTER/MERGE THIS
-
   res.json(Object.values(mergeConvos));
 }
 

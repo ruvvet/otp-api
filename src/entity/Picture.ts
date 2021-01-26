@@ -1,18 +1,17 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./User";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from './User';
 
 @Entity()
 export class Picture {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @ManyToOne(() => User)
+  user: User;
 
-    @ManyToOne(()=>User)
-    user: User;
+  @Column()
+  url: string;
 
-    @Column()
-    url: string;
-
-    @Column()
-    index: string;
+  @Column()
+  index: string;
 }
